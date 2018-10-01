@@ -18,14 +18,44 @@ margin-bottom: 40px;
 display: grid;
 grid-template-columns: 180px auto 100px 100px;
 `
-
-class App extends Component {
+const checkFirstVisit = () => {
+  let cryptoDashData = localStorage.getItem('cryptoDash');
+  if(!cryptoDashData){
+    return{
+    firstVisit: true,
+    page: 'dashboard'
+}
+  }
+  return {}
+}
+   
+export default class App extends Component {
 
   state={
-    page: 'dashboard'
+    page: 'dashboard',
+    ...checkFirstVisit()
   }
   displayingDashboard = () => this.state.page === 'dashboard'
   displayingSettings = () => this.state.page === 'settings'
+  firstVisitMessage = () => {
+    if(this.state.firstVisit){
+      return <div>Welcome to CryptoDash, please select your favorite coins to begin. </div>
+    }
+    }
+    confirmFavorites = () => {
+      localStorage.setItem('cryptoDash', 'test');
+      this.setState({
+        firstVisit: false
+      })
+    }
+    settingsContent = () => {
+      return <div>
+      {this.firstVisitMessage()}
+      <div onClick={this.confirmFavorites}>
+      Confirm Favorites
+      </div>
+      </div>
+    }
   render() {
     return (
      
@@ -36,15 +66,16 @@ class App extends Component {
       </Logo>
       <div>
       </div>
+      {!this.state.firstVisit && (
       <ControlButton onClick={()=>{this.setState({page: 'dashboard'})}} active={this.displayingDashboard()}>
       DashBoard
-      </ControlButton>
+      </ControlButton>)}
       <ControlButton onClick={()=>{this.setState({page: 'settings'})}}active={this.displayingSettings()}>
       Settings
       </ControlButton>
       </Bar>
       <content>
-      Hello I'm {this.state.page}
+     {this.displayingSettings() && this.settingsContent()}
       </content>
       </div>
      
@@ -52,4 +83,3 @@ class App extends Component {
   }
 }
 
-export default App;
