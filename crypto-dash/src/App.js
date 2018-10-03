@@ -1,23 +1,13 @@
 import React, { Component } from 'react';
 import './App.css';
 import styled, {css} from 'styled-components';
-
-const Logo = styled.div`
-font-size: 1.5em;
-`
-const ControlButton = styled.div`
-cursor: pointer;
-${props => props.active && css`
-text-shadow: 10px 10px 60px #03ff03
-`}
+import AppBar from './AppBar';
+const cc = require('cryptocompare')
+const AppLayout = styled.div`
+padding:42px
 `
 
-const Bar = styled.div`
-padding: 40px;
-margin-bottom: 40px;
-display: grid;
-grid-template-columns: 180px auto 100px 100px;
-`
+
 const checkFirstVisit = () => {
   let cryptoDashData = localStorage.getItem('cryptoDash');
   if(!cryptoDashData){
@@ -31,9 +21,20 @@ const checkFirstVisit = () => {
    
 export default class App extends Component {
 
-  state={
-    page: 'dashboard',
+  state = {
+    page: 'settings',
     ...checkFirstVisit()
+  }
+    componentDidMount() { 
+      this.fetchCoins();
+    }
+    fetchCoins = async () => {
+      let coinList = (await cc.coinList()).Data;
+      this.setState({coinList});
+      console.log(coinList);
+    {
+      console.log('fetching coins...')
+    }
   }
   displayingDashboard = () => this.state.page === 'dashboard'
   displayingSettings = () => this.state.page === 'settings'
@@ -56,24 +57,17 @@ export default class App extends Component {
       </div>
       </div>
     }
+    loadingContent = () => {
+      if(!this.state.coinList){
+        return<div> Loading Coins </div>
+      }
+    }
   render() {
     return (
      
       <div>
-      <Bar>
-      <Logo>
-      CryptoDash 
-      </Logo>
-      <div>
-      </div>
-      {!this.state.firstVisit && (
-      <ControlButton onClick={()=>{this.setState({page: 'dashboard'})}} active={this.displayingDashboard()}>
-      DashBoard
-      </ControlButton>)}
-      <ControlButton onClick={()=>{this.setState({page: 'settings'})}}active={this.displayingSettings()}>
-      Settings
-      </ControlButton>
-      </Bar>
+      {AppBar.call(this)}
+      
       <content>
      {this.displayingSettings() && this.settingsContent()}
       </content>
